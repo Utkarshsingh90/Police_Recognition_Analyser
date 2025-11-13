@@ -13,7 +13,6 @@ from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib.units import inch
-from reportlab.pdfgen import canvas
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -25,51 +24,70 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Enhanced CSS with proper contrast and visibility
+# DARK THEME CSS with Perfect Text Visibility
 st.markdown("""
 <style>
+    /* Import Google Fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    
+    /* Root and body styling */
+    .stApp {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        font-family: 'Inter', sans-serif;
+    }
+    
     /* Main header */
     .main-header {
-        font-size: 2.8rem;
-        font-weight: bold;
+        font-size: 3rem;
+        font-weight: 700;
         text-align: center;
-        padding: 25px;
+        padding: 30px;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
         margin-bottom: 20px;
+        text-shadow: 0 0 30px rgba(102, 126, 234, 0.3);
     }
     
-    /* Info boxes */
+    /* Info boxes - Dark theme */
     .info-box {
         padding: 20px;
         border-radius: 12px;
-        background-color: #e3f2fd;
-        border-left: 6px solid #1976d2;
+        background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+        border-left: 6px solid #3b82f6;
         margin: 15px 0;
-        color: #01579b !important;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        color: #e0e7ff !important;
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+    }
+    
+    .info-box h4 {
+        color: #93c5fd !important;
+        margin-bottom: 10px;
     }
     
     .success-box {
         padding: 18px;
         border-radius: 12px;
-        background-color: #d4edda;
-        border-left: 6px solid #28a745;
+        background: linear-gradient(135deg, #065f46 0%, #047857 100%);
+        border-left: 6px solid #10b981;
         margin: 15px 0;
-        color: #155724 !important;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        color: #d1fae5 !important;
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
+    }
+    
+    .success-box h4 {
+        color: #6ee7b7 !important;
     }
     
     .warning-box {
         padding: 18px;
         border-radius: 12px;
-        background-color: #fff3cd;
-        border-left: 6px solid #ffc107;
+        background: linear-gradient(135deg, #92400e 0%, #b45309 100%);
+        border-left: 6px solid #f59e0b;
         margin: 15px 0;
-        color: #856404 !important;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        color: #fef3c7 !important;
+        box-shadow: 0 4px 15px rgba(245, 158, 11, 0.2);
     }
     
     /* Metric cards */
@@ -77,103 +95,138 @@ st.markdown("""
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         padding: 25px;
         border-radius: 15px;
-        color: white;
+        color: #ffffff !important;
         text-align: center;
-        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
         transition: transform 0.3s ease;
     }
     
     .metric-card:hover {
         transform: translateY(-5px);
+        box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
+    }
+    
+    .metric-card h2, .metric-card p {
+        color: #ffffff !important;
     }
     
     /* Tab styling */
     .stTabs [data-baseweb="tab-list"] {
-        gap: 30px;
-        background-color: #f8f9fa;
+        gap: 10px;
+        background-color: #1f2937;
         padding: 10px;
-        border-radius: 10px;
+        border-radius: 12px;
     }
     
     .stTabs [data-baseweb="tab"] {
         height: 55px;
         padding: 0 25px;
-        background-color: white;
+        background-color: #374151;
         border-radius: 10px;
-        color: #495057;
+        color: #d1d5db !important;
         font-weight: 600;
-        border: 2px solid #e9ecef;
+        border: 2px solid #4b5563;
         transition: all 0.3s ease;
     }
     
     .stTabs [aria-selected="true"] {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white !important;
+        color: #ffffff !important;
         border-color: #667eea;
     }
     
-    /* TEXT VISIBILITY FIXES - CRITICAL */
+    /* TEXT INPUT - CRITICAL FOR VISIBILITY */
     .stTextArea textarea {
-        color: #212529 !important;
-        background-color: #ffffff !important;
-        border: 2px solid #ced4da !important;
+        background-color: #1f2937 !important;
+        color: #f3f4f6 !important;
+        border: 2px solid #4b5563 !important;
         font-size: 16px !important;
         line-height: 1.6 !important;
+        border-radius: 8px !important;
     }
     
     .stTextArea textarea:focus {
         border-color: #667eea !important;
-        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25) !important;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3) !important;
+        background-color: #111827 !important;
+    }
+    
+    .stTextArea textarea::placeholder {
+        color: #9ca3af !important;
+        opacity: 1 !important;
     }
     
     .stTextInput input {
-        color: #212529 !important;
-        background-color: #ffffff !important;
-        border: 2px solid #ced4da !important;
+        background-color: #1f2937 !important;
+        color: #f3f4f6 !important;
+        border: 2px solid #4b5563 !important;
         font-size: 16px !important;
+        border-radius: 8px !important;
     }
     
     .stTextInput input:focus {
         border-color: #667eea !important;
-        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25) !important;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3) !important;
     }
     
-    /* Placeholder text */
-    .stTextArea textarea::placeholder,
     .stTextInput input::placeholder {
-        color: #6c757d !important;
-        opacity: 0.8 !important;
+        color: #9ca3af !important;
+    }
+    
+    /* Labels and headers */
+    label, .stMarkdown, h1, h2, h3, h4, h5, h6, p, span, div {
+        color: #f3f4f6 !important;
+    }
+    
+    .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {
+        color: #e0e7ff !important;
     }
     
     /* Radio buttons */
     .stRadio > label {
-        color: #212529 !important;
+        color: #f3f4f6 !important;
         font-weight: 600 !important;
     }
     
     .stRadio > div {
-        color: #495057 !important;
+        color: #d1d5db !important;
     }
     
-    /* Labels and text */
-    label, .stMarkdown, p, span, div {
-        color: #212529 !important;
+    .stRadio [role="radiogroup"] label {
+        color: #e5e7eb !important;
     }
     
     /* Sidebar */
-    .css-1d391kg, [data-testid="stSidebar"] {
-        background-color: #f8f9fa;
+    [data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
     }
     
     [data-testid="stSidebar"] .stMarkdown {
-        color: #212529 !important;
+        color: #f3f4f6 !important;
+    }
+    
+    [data-testid="stSidebar"] h1, 
+    [data-testid="stSidebar"] h2, 
+    [data-testid="stSidebar"] h3 {
+        color: #e0e7ff !important;
     }
     
     /* File uploader */
     .uploadedFile {
-        background-color: #e9ecef !important;
-        color: #212529 !important;
-        border: 2px solid #ced4da !important;
+        background-color: #374151 !important;
+        color: #f3f4f6 !important;
+        border: 2px solid #4b5563 !important;
+    }
+    
+    [data-testid="stFileUploader"] {
+        background-color: #1f2937;
+        border: 2px dashed #4b5563;
+        border-radius: 10px;
+        padding: 20px;
+    }
+    
+    [data-testid="stFileUploader"] label {
+        color: #d1d5db !important;
     }
     
     /* Buttons */
@@ -182,34 +235,124 @@ st.markdown("""
         border-radius: 8px;
         padding: 12px 24px;
         transition: all 0.3s ease;
+        color: #ffffff !important;
+    }
+    
+    .stButton button[kind="primary"] {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
     }
     
     .stButton button:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
     }
     
     /* Expander */
     .streamlit-expanderHeader {
-        background-color: #f8f9fa;
-        color: #212529 !important;
+        background-color: #1f2937 !important;
+        color: #f3f4f6 !important;
         font-weight: 600;
         border-radius: 8px;
+        border: 1px solid #4b5563;
+    }
+    
+    .streamlit-expanderHeader:hover {
+        background-color: #374151 !important;
+    }
+    
+    .streamlit-expanderContent {
+        background-color: #111827;
+        border: 1px solid #4b5563;
+        border-top: none;
     }
     
     /* Dataframe */
     .dataframe {
-        color: #212529 !important;
+        color: #f3f4f6 !important;
+        background-color: #1f2937;
     }
     
-    /* Ensure all text is visible */
-    * {
-        color: #212529;
+    /* Metrics */
+    [data-testid="stMetricValue"] {
+        color: #e0e7ff !important;
+        font-size: 2rem !important;
+        font-weight: 700 !important;
     }
     
-    /* Override Streamlit's default dark text on dark backgrounds */
-    .element-container, .stMarkdown, .stText {
-        color: #212529 !important;
+    [data-testid="stMetricLabel"] {
+        color: #9ca3af !important;
+    }
+    
+    /* Success/Error/Warning messages */
+    .stSuccess {
+        background-color: #065f46 !important;
+        color: #d1fae5 !important;
+        border-left: 5px solid #10b981;
+    }
+    
+    .stError {
+        background-color: #991b1b !important;
+        color: #fecaca !important;
+        border-left: 5px solid #ef4444;
+    }
+    
+    .stWarning {
+        background-color: #92400e !important;
+        color: #fef3c7 !important;
+        border-left: 5px solid #f59e0b;
+    }
+    
+    .stInfo {
+        background-color: #1e3a8a !important;
+        color: #dbeafe !important;
+        border-left: 5px solid #3b82f6;
+    }
+    
+    /* Download buttons */
+    .stDownloadButton button {
+        background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        color: #ffffff !important;
+    }
+    
+    /* Selectbox and multiselect */
+    .stSelectbox, .stMultiSelect {
+        color: #f3f4f6 !important;
+    }
+    
+    .stSelectbox > div > div {
+        background-color: #1f2937 !important;
+        color: #f3f4f6 !important;
+        border: 2px solid #4b5563 !important;
+    }
+    
+    /* Spinner */
+    .stSpinner > div {
+        border-top-color: #667eea !important;
+    }
+    
+    /* Links */
+    a {
+        color: #93c5fd !important;
+    }
+    
+    a:hover {
+        color: #bfdbfe !important;
+    }
+    
+    /* HR divider */
+    hr {
+        border-color: #4b5563 !important;
+    }
+    
+    /* Container backgrounds */
+    .element-container {
+        color: #f3f4f6 !important;
+    }
+    
+    /* Chart labels */
+    .vega-embed text {
+        fill: #d1d5db !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -282,7 +425,6 @@ def load_models():
             device=-1
         )
         
-        # Translation cache
         translation_cache = {}
         
         return sentiment_analyzer, summarizer, translation_cache, qa_model
@@ -343,28 +485,22 @@ def extract_officer_info_from_database(text: str) -> Dict:
     found_departments = []
     found_locations = []
     
-    # Search for officers
     for officer in OFFICER_DATABASE["names"]:
-        # Check both full name and last name
         if officer.lower() in text_lower:
             found_officers.append(officer)
         else:
-            # Check last name only
             last_name = officer.split()[-1]
             if last_name.lower() in text_lower:
                 found_officers.append(officer)
     
-    # Search for departments
     for dept in OFFICER_DATABASE["departments"]:
         if dept.lower() in text_lower:
             found_departments.append(dept)
     
-    # Search for locations
     for loc in OFFICER_DATABASE["locations"]:
         if loc.lower() in text_lower:
             found_locations.append(loc)
     
-    # Pattern matching fallback
     officer_patterns = [
         r'(?:Officer|Constable|Inspector|Sergeant|Detective|Chief|Captain|Lieutenant|SI|ASI|CI|PSI)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)',
     ]
@@ -374,7 +510,6 @@ def extract_officer_info_from_database(text: str) -> Dict:
         for match in matches:
             found_officers.append(f"Officer {match}")
     
-    # If no officers found, suggest from database
     if not found_officers:
         found_officers = ["(Officer name not found - please specify)"]
     
@@ -433,12 +568,10 @@ def generate_summary(text: str, summarizer) -> str:
         if len(text) < 100:
             return text
         
-        # For longer texts, create multi-part summary
         text_to_summarize = text[:1024]
         summary = summarizer(text_to_summarize, max_length=150, min_length=40, do_sample=False)
         return summary[0]['summary_text']
     except:
-        # Fallback to simple truncation
         sentences = text.split('.')[:3]
         return '. '.join(sentences) + '.'
 
@@ -461,14 +594,13 @@ def create_pdf_summary(result: Dict) -> BytesIO:
     styles = getSampleStyleSheet()
     story = []
     
-    # Custom styles
     title_style = ParagraphStyle(
         'CustomTitle',
         parent=styles['Heading1'],
         fontSize=24,
         textColor=colors.HexColor('#667eea'),
         spaceAfter=30,
-        alignment=1  # Center
+        alignment=1
     )
     
     heading_style = ParagraphStyle(
@@ -480,21 +612,16 @@ def create_pdf_summary(result: Dict) -> BytesIO:
         spaceBefore=12
     )
     
-    # Title
     story.append(Paragraph("🚔 Police Recognition Report", title_style))
     story.append(Spacer(1, 0.3*inch))
     
-    # Timestamp
     story.append(Paragraph(f"<b>Generated:</b> {datetime.now().strftime('%B %d, %Y at %I:%M %p')}", styles['Normal']))
     story.append(Spacer(1, 0.2*inch))
     
-    # Summary
     story.append(Paragraph("Summary", heading_style))
     story.append(Paragraph(result['summary'], styles['Normal']))
     story.append(Spacer(1, 0.2*inch))
     
-    # Metrics table
-    story.append(Paragraph("Recognition Metrics", heading_style))
     metrics_data = [
         ['Metric', 'Value'],
         ['Recognition Score', f"{result['recognition_score']}/1.0"],
@@ -517,19 +644,16 @@ def create_pdf_summary(result: Dict) -> BytesIO:
     story.append(metrics_table)
     story.append(Spacer(1, 0.3*inch))
     
-    # Officers
     story.append(Paragraph("Identified Officers", heading_style))
     for officer in result['extracted_officers']:
         story.append(Paragraph(f"• {officer}", styles['Normal']))
     story.append(Spacer(1, 0.2*inch))
     
-    # Departments
     story.append(Paragraph("Departments", heading_style))
     for dept in result['extracted_departments']:
         story.append(Paragraph(f"• {dept}", styles['Normal']))
     story.append(Spacer(1, 0.2*inch))
     
-    # Tags
     story.append(Paragraph("Competency Tags", heading_style))
     for tag in result['suggested_tags']:
         story.append(Paragraph(f"• {tag.replace('_', ' ').title()}", styles['Normal']))
@@ -543,26 +667,14 @@ def process_text(text: str, models_tuple) -> Dict:
     sentiment_analyzer, summarizer, translator_cache, qa_model = models_tuple
     
     original_text = text
-    
-    # Translate if needed
     translated_text, detected_lang = translate_to_english(text, translator_cache)
-    
-    # Use translated text for processing
     processing_text = translated_text if detected_lang != 'en' else original_text
     
-    # Extract entities from database
     entities = extract_officer_info_from_database(processing_text)
-    
-    # Analyze sentiment
     sentiment = analyze_sentiment(processing_text, sentiment_analyzer)
-    
-    # Extract tags
     tags = extract_competency_tags(processing_text)
-    
-    # Generate summary
     summary = generate_summary(processing_text, summarizer)
     
-    # Calculate score
     score = calculate_recognition_score(
         sentiment['normalized_score'],
         tags,
@@ -602,9 +714,9 @@ def main():
     
     st.markdown("""
     <div class="info-box">
-        <b>🎯 Welcome!</b> This AI-powered platform analyzes public feedback, news articles, and documents to identify 
-        and recognize outstanding police work. Features include automatic translation, entity extraction, sentiment analysis, 
-        and comprehensive PDF reports.
+        <h4>🎯 Welcome to the AI-Powered Police Recognition System</h4>
+        Analyze public feedback, news articles, and documents to identify and recognize outstanding police work. 
+        Features include automatic translation, entity extraction, sentiment analysis, and comprehensive PDF reports.
     </div>
     """, unsafe_allow_html=True)
     
@@ -623,28 +735,31 @@ def main():
         
         st.markdown("---")
         st.subheader("📊 Statistics")
-        st.metric("📝 Total Processed", len(st.session_state.processed_data))
         
-        if st.session_state.processed_data:
-            avg_score = sum(d['recognition_score'] for d in st.session_state.processed_data) / len(st.session_state.processed_data)
-            st.metric("⭐ Avg Score", f"{avg_score:.2f}")
-            
-            positive_count = sum(1 for d in st.session_state.processed_data if d['sentiment_label'] == 'POSITIVE')
-            st.metric("😊 Positive", positive_count)
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("📝 Total", len(st.session_state.processed_data))
+        with col2:
+            if st.session_state.processed_data:
+                avg_score = sum(d['recognition_score'] for d in st.session_state.processed_data) / len(st.session_state.processed_data)
+                st.metric("⭐ Avg", f"{avg_score:.2f}")
         
         st.markdown("---")
         st.subheader("🌐 Supported Languages")
-        st.write("✅ **Indic Languages:**")
-        st.write("Hindi • Odia • Bengali")
-        st.write("Tamil • Telugu • Marathi")
-        st.write("Gujarati • Kannada • Urdu")
         
-        st.write("✅ **European:**")
-        st.write("Spanish • French • German")
+        st.markdown("""
+        **✅ Indic Languages:**
+        - Hindi • Odia • Bengali
+        - Tamil • Telugu • Marathi
+        - Gujarati • Kannada
+        
+        **✅ European:**
+        - Spanish • French • German
+        """)
         
         st.markdown("---")
         st.subheader("👮 Officer Database")
-        st.info(f"**{len(OFFICER_DATABASE['names'])}** officers\n\n**{len(OFFICER_DATABASE['departments'])}** departments")
+        st.info(f"**{len(OFFICER_DATABASE['names'])}** officers  \n**{len(OFFICER_DATABASE['departments'])}** departments")
         
         st.markdown("---")
         
@@ -680,15 +795,13 @@ def main():
                 text_to_process = st.text_area(
                     "Enter feedback, article, or document (any language):",
                     height=250,
-                    placeholder="Example:\nOfficer Smith from the Central Police Station showed exceptional bravery when he rescued a child from a burning building...\n\nया Odia में:\nଅଫିସର ସ୍ମିଥ ଅସାଧାରଣ ସାହସ ଦେଖାଇଥିଲେ...",
-                    key="main_text_input",
-                    help="Paste your text here. Supports multiple languages with automatic translation."
+                    placeholder="Example:\nOfficer Smith from Central Police Station showed exceptional bravery...\n\nया Odia में: ଅଫିସର ସ୍ମିଥ ଅସାଧାରଣ ସାହସ ଦେଖାଇଥିଲେ...",
+                    key="main_text_input"
                 )
             else:
                 uploaded_file = st.file_uploader(
                     "📤 Upload Document (TXT or PDF)",
-                    type=['txt', 'pdf'],
-                    help="Upload a text file or PDF document for analysis"
+                    type=['txt', 'pdf']
                 )
                 
                 if uploaded_file:
@@ -702,21 +815,21 @@ def main():
                                 text_to_process = ""
                                 for page in pdf.pages:
                                     text_to_process += page.extract_text() or ""
-                            st.success(f"✅ Extracted {len(text_to_process)} characters from {len(pdf.pages)} pages")
+                            st.success(f"✅ Extracted {len(text_to_process)} characters from PDF")
                     except Exception as e:
-                        st.error(f"❌ Error reading file: {str(e)}")
+                        st.error(f"❌ Error: {str(e)}")
                     
                     if text_to_process:
-                        with st.expander("📄 Preview Extracted Text"):
-                            st.text_area("Content Preview:", text_to_process[:500] + "...", height=150, key="file_preview", disabled=True)
+                        with st.expander("📄 Preview"):
+                            st.text_area("Content:", text_to_process[:500] + "...", height=150, key="preview", disabled=True)
         
         with col2:
             st.markdown("""
             <div class="info-box">
-                <h4>🌍 Multi-Language Support</h4>
-                • Automatic language detection<br>
-                • Translation to English<br>
-                • 15+ languages supported
+                <h4>🌍 Multi-Language</h4>
+                • Auto-detect language<br>
+                • Translate to English<br>
+                • 15+ languages
             </div>
             """, unsafe_allow_html=True)
             
@@ -725,9 +838,9 @@ def main():
                 <h4>✨ AI Features</h4>
                 ✅ Sentiment Analysis<br>
                 ✅ Entity Extraction<br>
-                ✅ Auto-Summarization<br>
-                ✅ Competency Tagging<br>
-                ✅ PDF Report Generation
+                ✅ Auto-Summary<br>
+                ✅ Competency Tags<br>
+                ✅ PDF Reports
             </div>
             """, unsafe_allow_html=True)
         
@@ -735,14 +848,14 @@ def main():
         
         if st.button("🚀 Analyze Feedback", type="primary", use_container_width=True):
             if text_to_process and text_to_process.strip():
-                with st.spinner("🔍 Analyzing feedback... This may take a moment..."):
+                with st.spinner("🔍 Analyzing..."):
                     try:
                         result = process_text(text_to_process, models)
                         st.session_state.processed_data.append(result)
                         
-                        st.markdown('<div class="success-box">✅ <b>Analysis Complete!</b></div>', unsafe_allow_html=True)
+                        st.success("✅ Analysis Complete!")
                         
-                        # Display metrics
+                        # Metrics
                         col1, col2, col3, col4 = st.columns(4)
                         
                         with col1:
@@ -754,7 +867,7 @@ def main():
                             """, unsafe_allow_html=True)
                         
                         with col2:
-                            emoji = "😊" if result['sentiment_label'] == 'POSITIVE' else "😐" if result['sentiment_label'] == 'NEUTRAL' else "😞"
+                            emoji = "😊" if result['sentiment_label'] == 'POSITIVE' else "😐"
                             st.markdown(f"""
                             <div class="metric-card">
                                 <h2>{emoji}</h2>
@@ -766,7 +879,7 @@ def main():
                             st.markdown(f"""
                             <div class="metric-card">
                                 <h2>{len(result['extracted_officers'])}</h2>
-                                <p>Officers Found</p>
+                                <p>Officers</p>
                             </div>
                             """, unsafe_allow_html=True)
                         
@@ -780,25 +893,23 @@ def main():
                         
                         st.markdown("---")
                         
-                        # Detailed results
-                        with st.expander("📋 View Detailed Results", expanded=True):
-                            # Translation info
+                        # Details
+                        with st.expander("📋 View Details", expanded=True):
                             if result['translated_text']:
                                 st.markdown(f"""
                                 <div class="warning-box">
-                                    <b>🌐 Translation Notice:</b> Original text was in <b>{result['language_name']}</b> and has been translated to English for analysis.
+                                    <b>🌐 Translation:</b> Original in <b>{result['language_name']}</b>
                                 </div>
                                 """, unsafe_allow_html=True)
                                 
                                 col1, col2 = st.columns(2)
                                 with col1:
-                                    st.subheader("📄 Original Text")
-                                    st.text_area("", result['original_text'], height=150, key="orig_display", disabled=True)
+                                    st.subheader("📄 Original")
+                                    st.text_area("", result['original_text'], height=150, key="orig", disabled=True)
                                 with col2:
-                                    st.subheader("🔄 Translated Text")
-                                    st.text_area("", result['translated_text'], height=150, key="trans_display", disabled=True)
+                                    st.subheader("🔄 English")
+                                    st.text_area("", result['translated_text'], height=150, key="trans", disabled=True)
                             
-                            # Summary
                             st.subheader("📝 Summary")
                             st.markdown(f"""
                             <div class="info-box">
@@ -806,125 +917,115 @@ def main():
                             </div>
                             """, unsafe_allow_html=True)
                             
-                            # Entities
                             col1, col2 = st.columns(2)
                             
                             with col1:
-                                st.subheader("👮 Identified Officers")
-                                for officer in result['extracted_officers']:
-                                    st.markdown(f"• **{officer}**")
+                                st.subheader("👮 Officers")
+                                for o in result['extracted_officers']:
+                                    st.markdown(f"• **{o}**")
                                 
                                 st.subheader("🏢 Departments")
-                                for dept in result['extracted_departments']:
-                                    st.markdown(f"• **{dept}**")
+                                for d in result['extracted_departments']:
+                                    st.markdown(f"• **{d}**")
                             
                             with col2:
-                                st.subheader("🏷️ Competency Tags")
-                                for tag in result['suggested_tags']:
-                                    st.markdown(f"• **{tag.replace('_', ' ').title()}**")
+                                st.subheader("🏷️ Tags")
+                                for t in result['suggested_tags']:
+                                    st.markdown(f"• **{t.replace('_', ' ').title()}**")
                                 
                                 if result['extracted_locations']:
                                     st.subheader("📍 Locations")
-                                    for loc in result['extracted_locations']:
-                                        st.markdown(f"• **{loc}**")
+                                    for l in result['extracted_locations']:
+                                        st.markdown(f"• **{l}**")
                         
-                        # Export options
+                        # Export
                         st.markdown("---")
-                        st.subheader("📥 Export Options")
+                        st.subheader("📥 Export")
                         
                         col1, col2 = st.columns(2)
                         
                         with col1:
-                            # PDF Summary
                             pdf_buffer = create_pdf_summary(result)
                             st.download_button(
-                                "📄 Download PDF Summary",
+                                "📄 PDF Summary",
                                 data=pdf_buffer,
-                                file_name=f"police_recognition_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
+                                file_name=f"report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
                                 mime="application/pdf",
                                 use_container_width=True
                             )
                         
                         with col2:
-                            # JSON Export
                             st.download_button(
-                                "📋 Download JSON",
+                                "📋 JSON Data",
                                 data=json.dumps(result, indent=2, ensure_ascii=False),
-                                file_name=f"recognition_data_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json",
+                                file_name=f"data_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json",
                                 mime="application/json",
                                 use_container_width=True
                             )
                     
                     except Exception as e:
-                        st.error(f"❌ Error during analysis: {str(e)}")
+                        st.error(f"❌ Error: {str(e)}")
             else:
-                st.warning("⚠️ Please enter or upload some text to analyze.")
+                st.warning("⚠️ Please enter text")
     
     with tab2:
-        st.header("📊 Recognition Dashboard")
+        st.header("📊 Dashboard")
         
         if st.session_state.processed_data:
             df = pd.DataFrame(st.session_state.processed_data)
             
-            # Summary metrics
             col1, col2, col3, col4 = st.columns(4)
             
             with col1:
-                st.metric("📊 Total Submissions", len(df))
+                st.metric("📊 Total", len(df))
             with col2:
-                st.metric("⭐ Average Score", f"{df['recognition_score'].mean():.2f}")
+                st.metric("⭐ Avg Score", f"{df['recognition_score'].mean():.2f}")
             with col3:
-                positive_pct = (df['sentiment_label'] == 'POSITIVE').sum() / len(df) * 100
-                st.metric("😊 Positive Feedback", f"{positive_pct:.1f}%")
+                pos_pct = (df['sentiment_label'] == 'POSITIVE').sum() / len(df) * 100
+                st.metric("😊 Positive", f"{pos_pct:.0f}%")
             with col4:
-                total_officers = sum(len(officers) for officers in df['extracted_officers'])
-                st.metric("👮 Officers Recognized", total_officers)
+                total = sum(len(o) for o in df['extracted_officers'])
+                st.metric("👮 Officers", total)
             
             st.markdown("---")
             
-            # Charts
             col1, col2 = st.columns(2)
             
             with col1:
-                st.subheader("🏆 Top Recognized Officers")
+                st.subheader("🏆 Top Officers")
                 all_officers = [o for officers in df['extracted_officers'] for o in officers if not o.startswith("(")]
                 
                 if all_officers:
-                    officer_counts = pd.Series(all_officers).value_counts().head(10)
-                    st.bar_chart(officer_counts)
+                    st.bar_chart(pd.Series(all_officers).value_counts().head(10))
                 else:
-                    st.info("No officers identified yet")
+                    st.info("No officers yet")
             
             with col2:
-                st.subheader("📊 Competency Distribution")
+                st.subheader("📊 Tags")
                 all_tags = [t for tags in df['suggested_tags'] for t in tags]
                 
                 if all_tags:
-                    tag_counts = pd.Series(all_tags).value_counts()
-                    st.bar_chart(tag_counts)
+                    st.bar_chart(pd.Series(all_tags).value_counts())
             
-            # Recent submissions
             st.markdown("---")
-            st.subheader("📜 Recent Submissions")
+            st.subheader("📜 Recent")
             
             for idx in range(min(5, len(df))):
                 row = df.iloc[-(idx+1)]
-                with st.expander(f"📄 Submission {len(df) - idx} | Score: {row['recognition_score']} | Language: {row['language_name']}"):
-                    st.markdown(f"**📝 Summary:** {row['summary']}")
-                    st.markdown(f"**👮 Officers:** {', '.join(row['extracted_officers'])}")
-                    st.markdown(f"**🏢 Departments:** {', '.join(row['extracted_departments'])}")
-                    st.markdown(f"**🏷️ Tags:** {', '.join([t.replace('_', ' ').title() for t in row['suggested_tags']])}")
-                    st.markdown(f"**😊 Sentiment:** {row['sentiment_label']} ({row['sentiment_score']:.2f})")
+                with st.expander(f"#{len(df)-idx} | Score: {row['recognition_score']} | {row['language_name']}"):
+                    st.markdown(f"**📝** {row['summary']}")
+                    st.markdown(f"**👮** {', '.join(row['extracted_officers'])}")
+                    st.markdown(f"**🏷️** {', '.join([t.replace('_', ' ').title() for t in row['suggested_tags']])}")
         else:
-            st.info("ℹ️ No data processed yet. Go to 'Process Feedback' tab to get started!")
+            st.info("No data yet")
     
     with tab3:
-        st.header("💬 Q&A Chat Assistant")
+        st.header("💬 Q&A Chat")
         
         if st.session_state.processed_data:
             st.markdown("""
             <div class="info-box">
-                Ask questions about the analyzed feedback. The AI will search through all processed documents to find answers.
+                Ask questions about analyzed feedback
             </div>
             """, unsafe_allow_html=True)
             
@@ -934,73 +1035,65 @@ def main():
             ])
             
             question = st.text_input(
-                "💭 Ask a question:",
-                placeholder="e.g., What acts of bravery were mentioned? Which officers showed compassion?",
-                key="qa_question"
+                "💭 Ask:",
+                placeholder="What acts of bravery were mentioned?",
+                key="qa_q"
             )
             
             if st.button("🔍 Get Answer", type="primary"):
                 if question:
-                    with st.spinner("🤔 Searching for answer..."):
+                    with st.spinner("🤔 Searching..."):
                         answer = answer_question(question, all_texts[:2000], models[3])
-                        st.session_state.chat_history.append({"q": question, "a": answer, "time": datetime.now()})
+                        st.session_state.chat_history.append({"q": question, "a": answer})
                         st.rerun()
             
-            # Chat history
             if st.session_state.chat_history:
                 st.markdown("---")
-                st.subheader("💬 Conversation History")
+                st.subheader("💬 History")
                 
                 for i, chat in enumerate(reversed(st.session_state.chat_history), 1):
                     st.markdown(f"""
                     <div class="info-box">
-                        <b>❓ Question {len(st.session_state.chat_history) - i + 1}:</b> {chat['q']}
+                        <b>❓ Q{len(st.session_state.chat_history) - i + 1}:</b> {chat['q']}
                     </div>
                     """, unsafe_allow_html=True)
                     
                     st.markdown(f"""
                     <div class="success-box">
-                        <b>✅ Answer:</b> {chat['a']}
+                        <b>✅ A:</b> {chat['a']}
                     </div>
                     """, unsafe_allow_html=True)
-                    
                     st.markdown("---")
         else:
-            st.warning("⚠️ Please process some feedback first before using the Q&A feature!")
+            st.warning("Process feedback first")
     
     with tab4:
-        st.header("📈 Export & Data Management")
+        st.header("📈 Export Data")
         
         if st.session_state.processed_data:
             df = pd.DataFrame(st.session_state.processed_data)
             
-            st.subheader("📊 Complete Data Table")
+            st.subheader("📊 Data Table")
             
-            # Column selector
-            all_columns = df.columns.tolist()
-            default_cols = [col for col in ['timestamp', 'recognition_score', 'sentiment_label', 'language_name', 'extracted_officers', 'suggested_tags'] if col in all_columns]
+            all_cols = df.columns.tolist()
+            default_cols = [c for c in ['timestamp', 'recognition_score', 'sentiment_label', 'language_name', 'extracted_officers'] if c in all_cols]
             
-            selected_columns = st.multiselect(
-                "Select columns to display:",
-                all_columns,
-                default=default_cols
-            )
+            selected = st.multiselect("Columns:", all_cols, default=default_cols)
             
-            if selected_columns:
-                st.dataframe(df[selected_columns], use_container_width=True, height=400)
+            if selected:
+                st.dataframe(df[selected], use_container_width=True, height=400)
             
-            # Export section
             st.markdown("---")
-            st.subheader("📥 Bulk Export Options")
+            st.subheader("📥 Bulk Export")
             
-            col1, col2, col3 = st.columns(3)
+            col1, col2 = st.columns(2)
             
             with col1:
                 csv_data = df.to_csv(index=False)
                 st.download_button(
-                    "📄 Download All as CSV",
+                    "📄 CSV",
                     data=csv_data,
-                    file_name=f"police_recognition_data_{datetime.now().strftime('%Y%m%d')}.csv",
+                    file_name=f"data_{datetime.now().strftime('%Y%m%d')}.csv",
                     mime="text/csv",
                     use_container_width=True
                 )
@@ -1008,21 +1101,14 @@ def main():
             with col2:
                 json_data = df.to_json(orient='records', indent=2, force_ascii=False)
                 st.download_button(
-                    "📋 Download All as JSON",
+                    "📋 JSON",
                     data=json_data,
-                    file_name=f"police_recognition_data_{datetime.now().strftime('%Y%m%d')}.json",
+                    file_name=f"data_{datetime.now().strftime('%Y%m%d')}.json",
                     mime="application/json",
                     use_container_width=True
                 )
-            
-            with col3:
-                # Generate combined PDF report
-                if st.button("📚 Generate Combined PDF", use_container_width=True):
-                    with st.spinner("Creating comprehensive PDF report..."):
-                        # Create a combined PDF for all entries
-                        st.info("Combined PDF generation for multiple entries coming soon!")
         else:
-            st.info("ℹ️ No data available for export. Process some feedback first!")
+            st.info("No data available")
 
 if __name__ == "__main__":
     main()
